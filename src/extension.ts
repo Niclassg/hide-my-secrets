@@ -1,30 +1,101 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
+let output = vscode.window.createOutputChannel("hide-my-secrets");
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
+const hideDecorationType = vscode.window.createTextEditorDecorationType({
+  backgroundColor: "red",
+  color: "red",
+});
+
 export function activate(context: vscode.ExtensionContext) {
-  // Use the console to output diagnostic information (console.log) and errors (console.error)
-  // This line of code will only be executed once when your extension is activated
-  console.log(
-    'Congratulations, your extension "hide-my-secrets" is now active!'
-  );
+  if (vscode.window.activeTextEditor) {
+    output.appendLine("Activated hide-my-secrets");
+    updateDecorations();
+  }
 
-  // The command has been defined in the package.json file
-  // Now provide the implementation of the command with registerCommand
-  // The commandId parameter must match the command field in package.json
+  vscode.window.onDidChangeActiveTextEditor((e) => {
+    output.appendLine("Changed active text editor");
+    updateDecorations();
+  });
+
+  vscode.workspace.onDidOpenTextDocument((e) => {
+    output.appendLine("opened text document");
+    updateDecorations();
+  });
+
   let disposable = vscode.commands.registerCommand(
     "hide-my-secrets.toggleVisibility",
-    () => {
-      // The code you place here will be executed every time your command is executed
-      // Display a message box to the user
-      vscode.window.showInformationMessage("Hello World from hide-my-secrets!");
-    }
+    toggleVisibility
   );
 
   context.subscriptions.push(disposable);
 }
+
+const toggleVisibility = () => {
+  vscode.workspace
+    .getConfiguration("hide-my-secrets")
+    .update("hideSecrets", !shouldSecretsHide());
+
+  output.appendLine("Toggled visibility to " + shouldSecretsHide());
+
+  updateDecorations();
+};
+
+const updateDecorations = () => {
+  const editor = vscode.window.activeTextEditor;
+  if (!editor) {
+    output.appendLine("No active text editor");
+    return;
+  }
+
+  if (shouldSecretsHide()) {
+    const words = vscode.workspace
+      .getConfiguration("hide-my-secrets")
+      .get("words") as string[];
+
+    let ranges: vscode.Range[] = [];
+    words.forEach((word) => {
+      const regex = new RegExp(word, "g");
+      let match;
+      while ((match = regex.exec(editor.document.getText())) !== null) {
+        const lineNumber = editor.document.positionAt(match.index).line;
+        const line = editor.document.lineAt(lineNumber);
+        const range = new vscode.Range(
+          editor.document.positionAt(match.index + match[0].length),
+          line.range.end
+        );
+        const validatedRange = editor.document.validateRange(range);
+
+        output.appendLine(
+          "Range: " +
+            validatedRange.start.line +
+            ":" +
+            validatedRange.start.character +
+            " to " +
+            validatedRange.end.line +
+            ":" +
+            validatedRange.end.character
+        );
+        ranges.push(
+          validatedRange
+          //   new vscode.Range(
+          //     editor.document.positionAt(match.index),
+          //     editor.document.positionAt(match.index + match[0].length))
+        );
+      }
+    });
+    editor.setDecorations(hideDecorationType, ranges);
+  } else {
+    output.appendLine("Clearing decorations");
+    editor.setDecorations(hideDecorationType, []);
+  }
+};
+
+const shouldSecretsHide = () => {
+  return (
+    vscode.workspace.getConfiguration("hide-my-secrets").get("hideSecrets") ||
+    false
+  );
+};
 
 // this method is called when your extension is deactivated
 export function deactivate() {}

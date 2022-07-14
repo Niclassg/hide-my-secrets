@@ -14,7 +14,8 @@
     "Other"
   ],
   "activationEvents": [
-    "hide-my-secrets.toggleVisibility"
+    "onStartupFinished",
+    "onCommand:hide-my-secrets.toggleVisibility"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -26,13 +27,20 @@
     ],
     "configuration": {
       "properties": {
-        "hide-my-secrets.regex": {
-          "type": "string",
-          "description": "Regex to hide"
+        "hide-my-secrets.words": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "title": "Secret keys"
+          },
+          "default": [
+            "DATABASE_URL"
+          ],
+          "description": "Secrets to hide"
         },
-        "hide-my-secrets.hideRegex": {
+        "hide-my-secrets.hideSecrets": {
           "type": "boolean",
-          "description": "Whether to hide the regex"
+          "description": "Whether to hide the secrets"
         }
       }
     },
