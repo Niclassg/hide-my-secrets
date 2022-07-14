@@ -2,6 +2,8 @@
 
 A VSCode extension for hiding secrets in the editor
 
+Link: [Extension](https://marketplace.visualstudio.com/items?itemName=Niclassg.niclassg-hide-my-secrets)
+
 ## Features
 
 Hide you secrets in vscode. Useful if recording or streaming. You can define multiple regexes you want to match on.
