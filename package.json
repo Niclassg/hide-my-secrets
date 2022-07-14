@@ -34,7 +34,10 @@
             "title": "Secret keys"
           },
           "default": [
-            "DATABASE_URL"
+            "_KEY",
+            "_SECRET",
+            "_PASSWORD",
+            "_TOKEN"
           ],
           "description": "Secrets to hide"
         },
