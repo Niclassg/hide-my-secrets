@@ -31,13 +31,17 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 const toggleVisibility = () => {
+  const shouldHide = !shouldSecretsHide();
+  output.appendLine("Toggling shouldHideSecrets to: " + shouldHide);
   vscode.workspace
     .getConfiguration("hide-my-secrets")
-    .update("hideSecrets", !shouldSecretsHide());
-
-  output.appendLine("Toggled visibility to " + shouldSecretsHide());
-
-  updateDecorations();
+    .update("hideSecrets", shouldHide)
+    .then(() => {
+      output.appendLine(
+        "Really toggled shouldHideSecrets to " + shouldSecretsHide()
+      );
+      updateDecorations();
+    });
 };
 
 const updateDecorations = () => {
@@ -66,7 +70,7 @@ const updateDecorations = () => {
         const validatedRange = editor.document.validateRange(range);
 
         output.appendLine(
-          "Range: " +
+          "Hiding Range: " +
             validatedRange.start.line +
             ":" +
             validatedRange.start.character +
@@ -91,10 +95,9 @@ const updateDecorations = () => {
 };
 
 const shouldSecretsHide = () => {
-  return (
-    vscode.workspace.getConfiguration("hide-my-secrets").get("hideSecrets") ||
-    false
-  );
+  return vscode.workspace
+    .getConfiguration("hide-my-secrets")
+    .get("hideSecrets");
 };
 
 // this method is called when your extension is deactivated

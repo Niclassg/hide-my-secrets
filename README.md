@@ -17,9 +17,14 @@ This extension contributes the following settings:
 ## Known Issues
 
 * A line immediately after a hidden secret will also be hidden if starting to write in it until retoggling
+* Toggling using the command doesn't work correctly. For some reason updating the configuration doesn't take effect until the active window is reloaded. Using the option in the settings ui or settings.json works as intended.
 
 ## Release Notes
 
 ### 0.0.1
 
 Initial release of hide-my-secrets
+
+### 0.0.2
+
+Hiding is now true by default
