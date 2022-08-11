@@ -21,6 +21,8 @@ This extension contributes the following settings:
 * A line immediately after a hidden secret will also be hidden if starting to write in it until retoggling
 * Toggling using the command doesn't work correctly. For some reason updating the configuration doesn't take effect until the active window is reloaded. Using the option in the settings ui or settings.json works as intended.
 
+## Contributions welcome!
+
 ## Release Notes
 
 ### 0.0.1
